@@ -1,4 +1,3 @@
-
 package com.mycompany.parcking;
 import javax.swing.*;
 import java.awt.*;
@@ -26,8 +25,10 @@ public class ParquimetroGui {
     private Parquimetro parquimetro;
     private LocalDate fechaEntrada;
     private LocalTime horaEntrada;
+    private LocalTime horaSalida;
     private Timer timer;
     private JLabel bienvenido;
+    private double montoAPagarPorMinuto = 0.35;
     public ParquimetroGui() {
         parquimetro = new Parquimetro();
         initializeUI();   
@@ -38,6 +39,7 @@ public class ParquimetroGui {
     private void initializeUI() {
         mainFrame = new JFrame("Parquímetro");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
         mainFrame.setSize(800, 700);
         mainFrame.setLocationRelativeTo(null);
         cardLayout = new CardLayout();
@@ -118,6 +120,9 @@ public class ParquimetroGui {
     
      
     private void registrarVehiculo(ActionEvent e) {
+        
+         
+        
         String placa = placaTextField.getText();
             try {
                  parquimetro.registrarVehiculo(placa);
@@ -129,7 +134,7 @@ public class ParquimetroGui {
         fechaEntrada = LocalDate.now();
             horaEntrada = LocalTime.now();
                 infoLabel.setText("Vehículo asociado al numero de placa: " + "[ "+ placa + " ] " +" fue ingresado el: " + fechaEntrada +" a las: "+ horaEntrada + " Y lleva" );
-                    startTimer();
+                   startTimer();
                         cardLayout.show(cardPanel, "Tiempo");
     }
 
@@ -153,20 +158,25 @@ public class ParquimetroGui {
     }
 
     private void calcularMonto(ActionEvent e) {
-        try {
+       try {
             timer.stop();
-                // Esa parte del codigo es para calcular el monto y monstrarlo en pantalla
-                double monto = parquimetro.calcularMonto(placaTextField.getText()); // Ejemplo, ajusta según tu lógica
-                    JOptionPane.showMessageDialog(mainFrame, "Monto a pagar: " + monto);
-                   }    
-                        catch (Exception ex) {
-                            Logger.getLogger(ParquimetroGui.class.getName()).log(Level.SEVERE, null, ex);
-                                }
+
+            // Calcula el tiempo total estacionado
+            Duration duracion = Duration.between(horaEntrada, LocalTime.now());
+            long minutosEstacionado = duracion.toMinutes();
+
+            // Calcula el monto a pagar según la fórmula proporcionada
+            double monto = (minutosEstacionado * montoAPagarPorMinuto) / 35;
+
+            // Muestra el monto en pantalla
+            JOptionPane.showMessageDialog(mainFrame, "Monto a pagar: $" + monto);
+        } catch (Exception ex) {
+            Logger.getLogger(ParquimetroGui.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-    
+   
 }
-
 
 
 
